@@ -1,6 +1,7 @@
 package com.mjsamaha.codelobster.common.exception;
 
 import java.time.Instant;
+import java.util.DuplicateFormatFlagsException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,6 +20,34 @@ import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+	
+	@ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotFound1(
+            UserNotFoundException ex,
+            HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(
+            ResourceNotFoundException ex,
+            HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler({UsernameTakenException.class, EmailAlreadyUsedException.class})
+    public ResponseEntity<Map<String, Object>> handleConflict1(
+            RuntimeException ex,
+            HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(DuplicateFormatFlagsException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateResource(
+            DuplicateFormatFlagsException ex,
+            HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request, null);
+    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFound(
