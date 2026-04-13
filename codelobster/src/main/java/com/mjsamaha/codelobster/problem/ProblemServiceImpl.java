@@ -95,19 +95,21 @@ public class ProblemServiceImpl implements ProblemService {
     // Publish lifecycle
 
     @Override
-    public ProblemAdminDetailResponse publishProblem(Long id) {
+    public ProblemAdminDetailResponse publishProblem(Long id, Long callerId) {
         Problem problem = findProblemOrThrow(id);
+        assertOwnerOrAdmin(problem, callerId);
         problem.setIsPublished(true);
         return problemMapper.toAdminDetailResponse(problemRepository.save(problem));
     }
 
     @Override
-    public ProblemAdminDetailResponse unpublishProblem(Long id) {
+    public ProblemAdminDetailResponse unpublishProblem(Long id, Long callerId) {
         Problem problem = findProblemOrThrow(id);
+        assertOwnerOrAdmin(problem, callerId);
         problem.setIsPublished(false);
         return problemMapper.toAdminDetailResponse(problemRepository.save(problem));
     }
-
+    
     // Public reads
 
     @Override
@@ -238,9 +240,8 @@ public class ProblemServiceImpl implements ProblemService {
         User caller = findUserOrThrow(callerId);
         boolean isOwner = problem.getAuthor() != null
                 && problem.getAuthor().getId().equals(callerId);
-        boolean isPrivileged = caller.getRole() == UserRole.ADMIN
-                || caller.getRole() == UserRole.PROBLEM_SETTER;
-        if (!isOwner && !isPrivileged) {
+        boolean isAdmin = caller.getRole() == UserRole.ADMIN;
+        if (!isOwner && !isAdmin) {
             throw new ForbiddenException("You do not have permission to modify this problem.");
         }
     }

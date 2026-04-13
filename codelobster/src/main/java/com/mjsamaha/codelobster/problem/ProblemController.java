@@ -11,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -137,21 +138,28 @@ public class ProblemController {
 
     /**
      * PATCH /api/admin/problems/{id}/publish
-     * Marks the problem as published (visible to all users).
+     * Marks the problem as published. Caller must be the owner or ADMIN.
      */
+    @PreAuthorize("hasAuthority('ROLE_PROBLEM_SETTER') or hasAuthority('ROLE_ADMIN')")
     @PatchMapping("/api/admin/problems/{id}/publish")
-    public ResponseEntity<ProblemAdminDetailResponse> publishProblem(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.publishProblem(id));
+    public ResponseEntity<ProblemAdminDetailResponse> publishProblem(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        return ResponseEntity.ok(problemService.publishProblem(id, currentUser.getUserId()));
     }
 
     /**
      * PATCH /api/admin/problems/{id}/unpublish
-     * Marks the problem as unpublished (draft mode).
+     * Marks the problem as unpublished. Caller must be the owner or ADMIN.
      */
+    @PreAuthorize("hasAuthority('ROLE_PROBLEM_SETTER') or hasAuthority('ROLE_ADMIN')")
     @PatchMapping("/api/admin/problems/{id}/unpublish")
-    public ResponseEntity<ProblemAdminDetailResponse> unpublishProblem(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.unpublishProblem(id));
+    public ResponseEntity<ProblemAdminDetailResponse> unpublishProblem(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        return ResponseEntity.ok(problemService.unpublishProblem(id, currentUser.getUserId()));
     }
+    
 
     /**
      * DELETE /api/admin/problems/{id}

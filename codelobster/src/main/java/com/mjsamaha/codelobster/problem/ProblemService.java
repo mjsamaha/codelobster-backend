@@ -25,9 +25,9 @@ public interface ProblemService {
 
     //Publication management
 
-    ProblemAdminDetailResponse publishProblem(Long id);
+    ProblemAdminDetailResponse publishProblem(Long id, Long callerId);
 
-    ProblemAdminDetailResponse unpublishProblem(Long id);
+    ProblemAdminDetailResponse unpublishProblem(Long id, Long callerId);
 
     // Public reads
 
